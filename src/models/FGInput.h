@@ -78,7 +78,7 @@ public:
   bool InitModel(void);
   /** Runs the Input model; called by the Executive
       Can pass in a value indicating if the executive is directing the simulation to Hold.
-      @param Holding if true, the executive has been directed to hold the sim from 
+      @param Holding if true, the executive has been directed to hold the sim from
                      advancing time. Some models may ignore this flag, such as the Input
                      model, which may need to be active to listen on a socket for the
                      "Resume" command to be given.
@@ -86,6 +86,7 @@ public:
   bool Run(bool Holding);
 
   bool Load(Element* el);
+  bool Load(int _port);
 
 private:
   unsigned int port;
@@ -96,4 +97,3 @@ private:
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #endif
-

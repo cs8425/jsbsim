@@ -95,6 +95,9 @@ double simulation_rate = 1./120.;
 bool override_sim_rate = false;
 double sleep_period=0.01;
 
+int input_port = 0;
+bool input = false;
+
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FORWARD DECLARATIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -188,7 +191,7 @@ CLASS DOCUMENTATION
  * formally known as JSBSim-ML (JSBSim Markup Language).
  *
  * JSBSim (www.jsbsim.org) was created initially for the open source FlightGear
- * flight simulator (www.flightgear.org). JSBSim maintains the ability to run 
+ * flight simulator (www.flightgear.org). JSBSim maintains the ability to run
  * as a standalone executable in soft real-time, or batch mode. This is useful
  * for running tests or sets of tests automatically using the internal scripting
  * capability.
@@ -212,7 +215,7 @@ CLASS DOCUMENTATION
  * basic theoretical aero knowledge.
  *
  * One of the more unique features of JSBSim is its method of modeling aircraft
- * systems such as a flight control system, autopilot, electrical, etc. 
+ * systems such as a flight control system, autopilot, electrical, etc.
  * These are modeled by assembling strings of components that represent filters,
  * switches, summers, gains, sensors, and so on.
  *
@@ -296,7 +299,7 @@ int real_main(int argc, char* argv[])
   LogDirectiveName.clear();
   bool result = false, success;
   bool was_paused = false;
-  
+
   double frame_duration;
 
   double new_five_second_value = 0.0;
@@ -332,6 +335,11 @@ int real_main(int argc, char* argv[])
   FDMExec->GetPropertyManager()->Tie("simulation/cycle_duration", &cycle_duration);
 
   if (nohighlight) FDMExec->disableHighLighting();
+
+  if(input && input_port){
+      FDMExec->GetInput()->Load(input_port);
+      printf("Input port: %d\n", input_port);
+  }
 
   if (simulation_rate < 1.0 )
     FDMExec->Setdt(simulation_rate);
@@ -455,18 +463,18 @@ int real_main(int argc, char* argv[])
   if (realtime) sleep_nseconds = (long)(frame_duration*1e9);
   else          sleep_nseconds = (sleep_period )*1e9;           // 0.01 seconds
 
-  tzset(); 
+  tzset();
   current_seconds = initial_seconds = getcurrentseconds();
 
   // *** CYCLIC EXECUTION LOOP, AND MESSAGE READING *** //
   while (result && FDMExec->GetSimTime() <= end_time) {
 
     FDMExec->ProcessMessage(); // Process messages, if any.
-    
+
     // Check if increment then hold is on and take appropriate actions if it is
     // Iterate is not supported in realtime - only in batch and playnice modes
     FDMExec->CheckIncrementalHold();
-    
+
     // if running realtime, throttle the execution, else just run flat-out fast
     // unless "playing nice", in which case sleep for a while (0.01 seconds) each frame.
     // If suspended, then don't increment cumulative realtime "stopwatch".
@@ -663,11 +671,14 @@ bool options(int count, char **arg)
     } else if (keyword == "--catalog") {
         catalog = true;
         if (value.size() > 0) AircraftName=value;
+    } else if (keyword == "--input") {
+        input = true;
+        if (value.size() > 0) input_port = atoi( value.c_str() );
     } else if (keyword.substr(0,2) != "--" && value.empty() ) {
       // See what kind of files we are specifying on the command line
 
       XMLFile xmlFile;
-      
+
       if (xmlFile.IsScriptFile(keyword)) ScriptName = keyword;
       else if (xmlFile.IsLogDirectiveFile(keyword))  LogDirectiveName.push_back(keyword);
       else if (xmlFile.IsAircraftFile("aircraft/" + keyword + "/" + keyword)) AircraftName = keyword;
@@ -738,4 +749,3 @@ void PrintHelp(void)
     cout << "  NOTE: There can be no spaces around the = sign when" << endl;
     cout << "        an option is followed by a filename" << endl << endl;
 }
-

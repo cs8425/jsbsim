@@ -117,7 +117,7 @@ bool FGInput::Run(bool Holding)
 
       // now parse individual line
       vector <string> tokens = split(line,' ');
-  
+
       string command="", argument="", str_value="";
       if (tokens.size() > 0) {
         command = to_lower(tokens[0]);
@@ -192,7 +192,7 @@ bool FGInput::Run(bool Holding)
 
         FDMExec->Resume();
         socket->Reply("");
-	
+
       } else if (command == "iterate") {             // ITERATE
 
         int argumentInt;
@@ -266,6 +266,30 @@ bool FGInput::Load(Element* element)
   }
 
   port = int(element->GetAttributeValueAsNumber("port"));
+  if (port == 0) {
+    cerr << endl << "No port assigned in input element" << endl;
+  } else {
+    socket = new FGfdmSocket(port);
+  }
+
+  Debug(2);
+
+  return true;
+}
+
+bool FGInput::Load(int _port)
+{
+  string type="", parameter="";
+  string name="", fname="";
+  string property;
+
+  // if the input has already been set up, print a warning message and return
+  if (port > 0) {
+    cerr << "An input port has already been assigned for this run" << endl;
+    return false;
+  }
+
+  port = _port;
   if (port == 0) {
     cerr << endl << "No port assigned in input element" << endl;
   } else {

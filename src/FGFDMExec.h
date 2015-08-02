@@ -51,6 +51,7 @@ INCLUDES
 #include "models/FGPropagate.h"
 #include "math/FGColumnVector3.h"
 #include "models/FGOutput.h"
+#include "models/FGInput.h"
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 DEFINITIONS
@@ -203,7 +204,7 @@ class FGFDMExec : public FGJSBBase, public FGXMLFileRead
       mated = true;
       internal = false;
     }
-    
+
     void Run(void) {exec->Run();}
     void AssignState(FGPropagate* source_prop) {
       exec->GetPropagate()->SetVState(source_prop->GetVState());
@@ -313,7 +314,7 @@ public:
                     the script file itself.
       @param initfile The initialization file that will override the initialization file
                       specified in the script file. If no file name is given on the command line,
-                      the file specified in the script will be used. If an initialization file 
+                      the file specified in the script will be used. If an initialization file
                       is not given in either place, an error will result.
       @return true if successfully loads; false otherwise. */
   bool LoadScript(const string& Script, double deltaT=0.0, const string initfile="");
@@ -328,12 +329,12 @@ public:
       "aircraft". Under aircraft, then, would be directories for various
       modeled aircraft such as C172/, x15/, etc.  */
   bool SetAircraftPath(const string& path) { AircraftPath = RootDir + path; return true; }
-  
+
   /** Sets the path to the systems config file directories.
       @param path path to the directory under which systems config
       files are kept, for instance "systems"  */
   bool SetSystemsPath(const string& path)   { SystemsPath = RootDir + path; return true; }
-  
+
   /// @name Top-level executive State and Model retrieval mechanism
   ///@{
   /// Returns the FGAtmosphere pointer.
@@ -410,7 +411,7 @@ public:
 
   /// Returns the current frame time (delta T).
   double GetDeltaT(void);
-*/  
+*/
   /// Returns a pointer to the property manager object.
   FGPropertyManager* GetPropertyManager(void);
   /// Returns a vector of strings representing the names of all loaded models (future)
@@ -628,7 +629,7 @@ private:
   FGPropertyManager* Root;
   bool StandAlone;
   FGPropertyManager* instance;
-  
+
   // The FDM counter is used to give each child FDM an unique ID. The root FDM has the ID 0
   unsigned int*      FDMctr;
 

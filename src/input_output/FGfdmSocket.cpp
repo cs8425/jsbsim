@@ -102,12 +102,15 @@ FGfdmSocket::FGfdmSocket(const string& address, int port, int protocol)
       int len = sizeof(struct sockaddr_in);
       if (connect(sckt, (struct sockaddr*)&scktName, len) == 0) {   // successful
         cout << "Successfully connected to socket for output ..." << endl;
+        cout << "[Output]Successful connected" << endl;
         connected = true;
       } else {                // unsuccessful
         cout << "Could not connect to socket for output ..." << endl;
+        cout << "[Output]Error connected" << endl;
       }
     } else {          // unsuccessful
       cout << "Could not create socket for FDM output, error = " << errno << endl;
+      cout << "[Output]Error not create socket" << endl;
     }
   }
   Debug(0);
@@ -154,12 +157,15 @@ FGfdmSocket::FGfdmSocket(const string& address, int port)
       int len = sizeof(struct sockaddr_in);
       if (connect(sckt, (struct sockaddr*)&scktName, len) == 0) {   // successful
         cout << "Successfully connected to socket for output ..." << endl;
+        cout << "[Output]Successful connected" << endl;
         connected = true;
       } else {                // unsuccessful
         cout << "Could not connect to socket for output ..." << endl;
+        cout << "[Output]Error connected" << endl;
       }
     } else {          // unsuccessful
       cout << "Could not create socket for FDM output, error = " << errno << endl;
+      cout << "[Output]Error not create socket" << endl;
     }
   }
   Debug(0);
@@ -197,15 +203,19 @@ FGfdmSocket::FGfdmSocket(int port)
           ioctl(sckt, FIONBIO, &NoBlock);
           sckt_in = accept(sckt, (struct sockaddr*)&scktName, (socklen_t*)&len);
         #endif
+        cout << "[Input]Successful bind & listen" << endl;
       } else {
         cerr << "Could not listen ..." << endl;
+        cout << "[Input]Error listen" << endl;
       }
       connected = true;
     } else {                // unsuccessful
       cerr << "Could not bind to socket for input ..." << endl;
+      cout << "[Input]Error bind" << endl;
     }
   } else {          // unsuccessful
     cerr << "Could not create socket for FDM input, error = " << errno << endl;
+    cout << "[Input]Error not create socket" << endl;
   }
 
   Debug(0);
@@ -243,7 +253,7 @@ string FGfdmSocket::Receive(void)
       #else
          ioctl(sckt_in, FIONBIO, &NoBlock);
       #endif
-      send(sckt_in, "Connected to JSBSim server\nJSBSim> ", 35, 0);
+      send(sckt_in, "Connected to JSBSim server!\n", 35, 0);
     }
   }
 
@@ -277,7 +287,7 @@ int FGfdmSocket::Reply(const string& text)
 
   if (sckt_in >= 0) {
     num_chars_sent = send(sckt_in, text.c_str(), text.size(), 0);
-    send(sckt_in, "JSBSim> ", 8, 0);
+    // send(sckt_in, "JSBSim> ", 8, 0);
   } else {
     cerr << "Socket reply must be to a valid socket" << endl;
     return -1;
@@ -320,7 +330,9 @@ void FGfdmSocket::Append(const char* item)
 void FGfdmSocket::Append(double item)
 {
   if (buffer.tellp() > 0) buffer << ',';
-  buffer << std::setw(12) << std::setprecision(7) << item;
+  // buffer << std::setw(12) << std::setprecision(7) << item;
+  // buffer << item;
+  buffer << std::setprecision(30) << item;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -328,7 +340,8 @@ void FGfdmSocket::Append(double item)
 void FGfdmSocket::Append(long item)
 {
   if (buffer.tellp() > 0) buffer << ',';
-  buffer << std::setw(12) << item;
+  // buffer << std::setw(12) << item;
+  buffer << item;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
